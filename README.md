@@ -55,3 +55,19 @@ Trying NLP project
 
 ### 向量化:
 将文本转换为数字形式，常用的方法有TF-IDF、Word2Vec等。
+
+# Learning about the Data
+
+### Distribution of Sentiments
+![image](https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/Distribution_of_Sentiments.jpg)
+
+### Positive WordCloud
+![image](https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/MostFrequentPositive.jpg)
+
+### Negative WordCloud
+![image](https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/MostFrequentNegative.jpg)
+
+![image]([t-SNE_visutalization_word2vecEmbeddings.jpg](https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/t-SNE_visutalization_word2vecEmbeddings.jpg)https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/t-SNE_visutalization_word2vecEmbeddings.jpg)
+
+
+![image]([regression_model_trained.png](https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/regression_model_trained.png)https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/regression_model_trained.png)
