@@ -70,3 +70,7 @@ Trying NLP project
 ![image](https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/t-SNE_visutalization_word2vecEmbeddings.jpg)
 
 ![image](https://github.com/Bruce0921/IMDb_Commands_Classification/blob/main/graphs/regression_model_trained.png)
+
+
+# Results
+seems both regression model or BERT transformer model are having a somewhat promising results with accuracy around 88%
