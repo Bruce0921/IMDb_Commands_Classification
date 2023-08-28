@@ -14,9 +14,9 @@ class IMDbDataset(torch.utils.data.Dataset):
         self.labels = labels
 
     def __getitem__(self, idx):
-        item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+        item = {key: val[idx].clone().detach() for key, val in self.encodings.items()}
         if self.labels:
-            item['labels'] = torch.tensor(self.labels[idx])
+            item['labels'] = self.labels[idx].clone().detach()
         return item
 
     def __len__(self):
@@ -24,7 +24,7 @@ class IMDbDataset(torch.utils.data.Dataset):
 
 # Load a Pre-trained BERT model and Tokenizer:
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
 
 # Splitting the data
 train_data, valid_data = train_test_split(main.labeled_train, test_size=0.1)  # 10% for validation
@@ -33,6 +33,7 @@ train_data, valid_data = train_test_split(main.labeled_train, test_size=0.1)  # 
 train_encodings = tokenizer(list(train_data['review'].apply(' '.join)), truncation=True, padding=True, max_length=512, return_tensors="pt")
 val_encodings = tokenizer(list(valid_data['review'].apply(' '.join)), truncation=True, padding=True, max_length=512, return_tensors="pt")
 test_encodings = tokenizer(list(main.test['review'].apply(' '.join)), truncation=True, padding=True, max_length=512, return_tensors="pt")
+
 # Add labels
 train_encodings["labels"] = torch.tensor(train_data['sentiment'].tolist())
 val_encodings["labels"] = torch.tensor(valid_data['sentiment'].tolist())
@@ -67,27 +68,16 @@ trainer = Trainer(
 # Train the model
 trainer.train()
 
-# Predict
-predictions = trainer.predict(test_dataset)
-predicted_labels = main.np.argmax(predictions.predictions, axis=1)
-
-
-
-# Train the model
-trainer.train()
-
 # Evaluate the model on the validation set
 eval_results = trainer.evaluate()
-
 print(f"Evaluation Loss: {eval_results['eval_loss']}")
 
 # Predict on the validation set for additional metrics
 val_predictions = trainer.predict(val_dataset)
-val_predicted_labels = main.np.argmax(val_predictions.predictions, axis=1)
+val_predicted_labels = np.argmax(val_predictions.predictions, axis=1)
 true_labels = valid_data['sentiment'].tolist()
 
 # Compute additional metrics
-
 accuracy = accuracy_score(true_labels, val_predicted_labels)
 precision = precision_score(true_labels, val_predicted_labels)
 recall = recall_score(true_labels, val_predicted_labels)
@@ -103,17 +93,20 @@ print(f"ROC-AUC: {roc_auc:.4f}")
 
 # Predict on the test set
 predictions = trainer.predict(test_dataset)
-predicted_labels = main.np.argmax(predictions.predictions, axis=1)
+predicted_labels = np.argmax(predictions.predictions, axis=1)
 
 # Ensure the length of predicted labels matches the test set
 assert len(predicted_labels) == len(main.test), "Mismatch between number of predictions and test samples."
 
+# Ensure the test dataset has 25,000 rows
+assert len(main.test) == 25000, "Test dataset does not have 25,000 rows."
+
 # Create the submission DataFrame using the correct IDs from the test set
-# Submission
 submission_df = pd.DataFrame({
     'id': main.test['id'].values,  # Use .values to ensure correct order
     'sentiment': predicted_labels
 })
 
+# Save the DataFrame to a CSV file with the correct format
+submission_df.to_csv('submission.csv', index=False, sep=',')
 
-submission_df.to_csv('submission.csv', index=False)
